@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/jnzader.github.io/unifront/static/css/main.e6c13ad2.css",
-    "main.js": "/jnzader.github.io/unifront/static/js/main.7b467a12.js",
-    "static/js/453.5c93e39f.chunk.js": "/jnzader.github.io/unifront/static/js/453.5c93e39f.chunk.js",
-    "index.html": "/jnzader.github.io/unifront/index.html",
-    "main.e6c13ad2.css.map": "/jnzader.github.io/unifront/static/css/main.e6c13ad2.css.map",
-    "main.7b467a12.js.map": "/jnzader.github.io/unifront/static/js/main.7b467a12.js.map",
-    "453.5c93e39f.chunk.js.map": "/jnzader.github.io/unifront/static/js/453.5c93e39f.chunk.js.map"
+    "main.css": "/unifront/static/css/main.e6c13ad2.css",
+    "main.js": "/unifront/static/js/main.1f66cd79.js",
+    "static/js/453.5c93e39f.chunk.js": "/unifront/static/js/453.5c93e39f.chunk.js",
+    "index.html": "/unifront/index.html",
+    "main.e6c13ad2.css.map": "/unifront/static/css/main.e6c13ad2.css.map",
+    "main.1f66cd79.js.map": "/unifront/static/js/main.1f66cd79.js.map",
+    "453.5c93e39f.chunk.js.map": "/unifront/static/js/453.5c93e39f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.7b467a12.js"
+    "static/js/main.1f66cd79.js"
   ]
 }
