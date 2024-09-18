@@ -1,70 +1,75 @@
-# Getting Started with Create React App
+# Gestión Educativa
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Gestión Educativa es una aplicación web diseñada como trabajo final para la materia Desarrollo de Aplicaciones Web de la Universidad Gastón Dachary. Su objetivo es facilitar la administración de instituciones educativas, permitiendo gestionar estudiantes, cursos, inscripciones y profesores.
+## Tabla de Contenidos
 
-## Available Scripts
+- [Características](#características)
+- [Tecnologías Utilizadas](#tecnologías-utilizadas)
+- [Instalación](#instalación)
+- [Uso](#uso)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Contribuciones](#contribuciones)
+- [Licencia](#licencia)
 
-In the project directory, you can run:
+## Características
 
-### `npm start`
+- **Gestión de Estudiantes**: Añadir, editar y eliminar información de estudiantes.
+- **Gestión de Cursos**: Crear y gestionar cursos disponibles.
+- **Inscripciones**: Permitir que los estudiantes se inscriban en los cursos.
+- **Gestión de Profesores**: Añadir y gestionar información sobre los profesores.
+- **Interfaz de Usuario Amigable**: Navegación intuitiva y fácil acceso a todas las secciones.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tecnologías Utilizadas
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **React**: Para la construcción de la interfaz de usuario.
+- **Material-UI**: Para los componentes de diseño y estilo.
+- **React Router**: Para la gestión de rutas en la aplicación.
+- **JavaScript / TypeScript**: Lenguaje de programación principal.
+- **Node.js**: Para el entorno de ejecución del servidor.
 
-### `npm test`
+## Instalación
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. **Clonar el repositorio**:
 
-### `npm run build`
+   ```bash
+   git clone https://github.com/tuusuario/gestion-educativa.git
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. **Navegar al directorio del proyecto**:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   ```bash
+   cd gestion-educativa
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Instalar las dependencias**:
 
-### `npm run eject`
+   ```bash
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. **Iniciar la aplicación**:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```bash
+   npm start
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   La aplicación se ejecutará en `http://localhost:3000`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Uso
 
-## Learn More
+- Al iniciar la aplicación, verás una página de bienvenida con enlaces a las diferentes secciones: Estudiantes, Cursos, Inscripciones y Profesores.
+- Navega a través de las secciones para gestionar la información de la institución.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Estructura del Proyecto
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+La estructura de carpetas del proyecto es la siguiente:
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+gestión-educativa/
+  ├── public/           # Archivos públicos (HTML, iconos, etc.)
+  ├── src/              # Código fuente de la aplicación
+  │   ├── components/    # Componentes de React
+  │   ├── pages/         # Páginas de la aplicación
+  │   ├── App.js         # Componente principal de la aplicación
+  │   └── index.js       # Punto de entrada de la aplicación
+  └── package.json       # Configuración del proyecto y dependencias

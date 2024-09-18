@@ -1,3 +1,10 @@
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  background-color: #f4f4f4; /* Light background */
+  color: #333;
+}
+
 .App {
   text-align: center;
 }
@@ -20,12 +27,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(12px + 2vmin);
   color: white;
+  padding: 2rem; /* Added padding */
 }
 
 .App-link {
   color: #61dafb;
+  text-decoration: none;
 }
 
 @keyframes App-logo-spin {
