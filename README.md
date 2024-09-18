@@ -8,8 +8,6 @@ Gestión Educativa es una aplicación web diseñada como trabajo final para la m
 - [Instalación](#instalación)
 - [Uso](#uso)
 - [Estructura del Proyecto](#estructura-del-proyecto)
-- [Contribuciones](#contribuciones)
-- [Licencia](#licencia)
 
 ## Características
 
