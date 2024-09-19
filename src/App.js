@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import {
   Container, AppBar, Toolbar, Typography, Button, Box,
@@ -11,19 +11,20 @@ import Estudiantes from './components/Estudiantes';
 import Cursos from './components/Cursos';
 import Inscripciones from './components/Inscripciones';
 import Profesores from './components/Profesores';
+import api from './api/api';
 
-// Crear un tema personalizado
+// Crear un tema personalizado para la aplicación
 const theme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'dark', // Establecer el modo de tema a oscuro
     primary: {
-      main: '#1976d2', // Ajusta el color primario
+      main: '#1976d2', // Color primario
     },
     secondary: {
-      main: '#4caf50', // Ajusta el color secundario
+      main: '#4caf50', // Color secundario
     },
     background: {
-      paper: '#303030', // Fondo oscuro para componentes
+      paper: '#303030', // Fondo oscuro para los componentes
       default: '#202020', // Fondo más oscuro para la aplicación
     },
   },
@@ -32,35 +33,59 @@ const theme = createTheme({
   },
 });
 
-// Estilizar el contenedor principal
+// Estilizar el contenedor principal de la aplicación
 const MainContainer = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(4),
-  marginBottom: theme.spacing(4),
+  marginTop: theme.spacing(4), // Margen superior
+  marginBottom: theme.spacing(4), // Margen inferior
 }));
 
 // Estilizar los botones de navegación
 const NavButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(1),
+  margin: theme.spacing(1), // Margen alrededor del botón
   '&:hover': {
     backgroundColor: theme.palette.primary.dark, // Color de fondo en hover
   },
 }));
 
 function App() {
-  const [mobileOpen, setMobileOpen] = React.useState(false); // Estado para controlar el Drawer en móviles
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Verifica si la pantalla es móvil
+  // Estado para controlar el Drawer en dispositivos móviles
+  const [mobileOpen, setMobileOpen] = useState(false);
+  // Verifica si la pantalla es móvil
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  // Estado para la conexión con la API
+  const [isApiOnline, setIsApiOnline] = useState(false);
 
-  /**
-   * Maneja la apertura y cierre del Drawer en móviles.
-   */
+  // Función para alternar el estado del Drawer
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  /**
-   * Componente del menú del Drawer.
-   */
+  // Función para verificar la conexión con la API
+  const checkApiConnection = async () => {
+    try {
+      const response = await api.get('/cursos'); // Cambia la URL a tu endpoint de prueba
+      if (response) {
+        setIsApiOnline(true); // API disponible
+      } else {
+        setIsApiOnline(false); // API no disponible
+      }
+    } catch (error) {
+      console.error('Error al verificar la conexión:', error);
+      setIsApiOnline(false); // Error en la conexión
+    }
+  };
 
+  // Hook para verificar la conexión a la API periódicamente
+  useEffect(() => {
+    checkApiConnection(); // Verifica inicialmente
+
+    const intervalId = setInterval(checkApiConnection, 5000); // Verifica cada 5 segundos
+
+    // Limpieza al desmontar el componente
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Contenido del Drawer para navegación
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
@@ -78,14 +103,10 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      {/* CssBaseline es un componente de Material-UI que normaliza el CSS */}
       <CssBaseline />
-      {/* Configura el enrutador para manejar las rutas en la aplicación */}
       <Router basename={process.env.PUBLIC_URL}>
-        {/* Barra de navegación superior (AppBar) */}
         <AppBar position="static">
           <Toolbar>
-            {/* Botón de menú para dispositivos móviles */}
             {isMobile && (
               <IconButton
                 color="inherit"
@@ -97,44 +118,63 @@ function App() {
                 <MenuIcon />
               </IconButton>
             )}
-            {/* Título de la aplicación como un enlace a la página principal */}
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
                 Gestión Educativa
               </Link>
             </Typography>
-            {/* Botones de navegación para pantallas más grandes */}
+
+            {/* Botones de navegación en la barra, alineados a la derecha */}
             {!isMobile && (
-              <>
-                <NavButton color="inherit" component={Link} to="/estudiantes">Estudiantes</NavButton>
-                <NavButton color="inherit" component={Link} to="/cursos">Cursos</NavButton>
-                <NavButton color="inherit" component={Link} to="/inscripciones">Inscripciones</NavButton>
-                <NavButton color="inherit" component={Link} to="/profesores">Profesores</NavButton>
-              </>
+              <Box>
+                <NavButton color="inherit" component={Link} to="/estudiantes">
+                  Estudiantes
+                </NavButton>
+                <NavButton color="inherit" component={Link} to="/cursos">
+                  Cursos
+                </NavButton>
+                <NavButton color="inherit" component={Link} to="/inscripciones">
+                  Inscripciones
+                </NavButton>
+                <NavButton color="inherit" component={Link} to="/profesores">
+                  Profesores
+                </NavButton>
+              </Box>
             )}
+
+            {/* Indicador de estado de conexión con la API */}
+            <Box
+              sx={{
+                width: 21,
+                height: 21,
+                borderRadius: '50%',
+                backgroundColor: isApiOnline ? 'green' : 'red', // Verde si está en línea, rojo si no
+              }}
+            />
           </Toolbar>
         </AppBar>
-        {/* Componente de navegación lateral (Drawer) */}
+
+        {/* Contenedor para el Drawer en dispositivos móviles */}
         <Box component="nav">
           <Drawer
-            variant="temporary" // Variantes del Drawer (temporal para móviles)
+            variant="temporary"
             open={mobileOpen}
-            onClose={handleDrawerToggle} // Maneja el cierre del Drawer
+            onClose={handleDrawerToggle}
             ModalProps={{
-              keepMounted: true, // Mejora el rendimiento en móviles
+              keepMounted: true, // Mantiene el Drawer montado para mejorar el rendimiento en dispositivos móviles
             }}
             sx={{
-              display: { xs: 'block', sm: 'none' }, // Muestra solo en móviles
+              display: { xs: 'block', sm: 'none' }, // Mostrar solo en dispositivos móviles
               '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
             }}
           >
-            {drawer} {/* Contenido del Drawer */}
+            {drawer}
           </Drawer>
         </Box>
-        {/* Contenedor principal donde se renderizan las rutas */}
+
         <MainContainer>
           <Routes>
-            {/* Ruta para la página principal */}
+            {/* Ruta principal */}
             <Route
               path="/"
               element={
@@ -146,7 +186,6 @@ function App() {
                     Elige una de las secciones a continuación:
                   </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {/* Botones de navegación a las secciones */}
                     <NavButton variant="contained" color="primary" component={Link} to="/estudiantes">
                       Estudiantes
                     </NavButton>
@@ -163,7 +202,7 @@ function App() {
                 </Box>
               }
             />
-            {/* Rutas para cada una de las secciones */}
+            {/* Rutas para cada sección */}
             <Route path="/estudiantes" element={<Estudiantes />} />
             <Route path="/cursos" element={<Cursos />} />
             <Route path="/inscripciones" element={<Inscripciones />} />
