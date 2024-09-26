@@ -286,47 +286,6 @@ function Cursos() {
                 </Alert>
             )}
 
-            {/* Search Section */}
-            <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
-                <Typography variant="h6" gutterBottom>Búsqueda de Cursos</Typography>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Buscar por Nombre"
-                            name="nombre"
-                            value={search.nombre}
-                            onChange={handleSearchChange}
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Buscar por Descripción"
-                            name="descripcion"
-                            value={search.descripcion}
-                            onChange={handleSearchChange}
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            select
-                            label="Buscar por Profesor"
-                            name="profesorId"
-                            value={search.profesorId}
-                            onChange={handleSearchChange}
-                            fullWidth
-                        >
-                            <MenuItem value="">Todos los profesores</MenuItem>
-                            {profesores.map(profesor => (
-                                <MenuItem key={profesor.id} value={profesor.id.toString()}>
-                                    {profesor.nombre} {profesor.apellido}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                </Grid>
-            </Paper>
             {/* Formulario para crear/editar cursos */}
             <Paper elevation={0} sx={{ p: 2, mb: 3 }}>
                 <Typography variant="h6" gutterBottom>
@@ -381,6 +340,48 @@ function Cursos() {
                 </form>
             </Paper>
 
+            {/* Search Section */}
+            <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>Búsqueda de Cursos</Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Nombre"
+                            name="nombre"
+                            value={search.nombre}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Descripción"
+                            name="descripcion"
+                            value={search.descripcion}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            select
+                            label="Buscar por Profesor"
+                            name="profesorId"
+                            value={search.profesorId}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        >
+                            <MenuItem value="">Todos los profesores</MenuItem>
+                            {profesores.map(profesor => (
+                                <MenuItem key={profesor.id} value={profesor.id.toString()}>
+                                    {profesor.nombre} {profesor.apellido}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
+                </Grid>
+            </Paper>
+            
             {/* Tabla de cursos */}
             <TableContainer component={Paper} style={{ marginTop: '20px' }}>
                 <Table>

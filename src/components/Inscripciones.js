@@ -289,45 +289,6 @@ function Inscripciones() {
                 </Alert>
             )}
             {/* campos de busqueda */}
-            <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
-                <Typography variant="h6" gutterBottom>Búsqueda de Inscripciones</Typography>
-
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Buscar por Curso"
-                            name="curso"
-                            value={search.curso}
-                            onChange={handleSearchChange}
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Buscar por Estudiante"
-                            name="estudiante"
-                            value={search.estudiante}
-                            onChange={handleSearchChange}
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <TextField
-                            label="Buscar por Nota"
-                            name="nota"
-                            value={search.nota}
-                            onChange={handleSearchChange}
-                            fullWidth
-                            type="number"
-                            step="0.01"
-                            inputProps={{
-                                min: 0, // Valor mínimo
-                                max: 10, // Valor máximo
-                            }}
-                        />
-                    </Grid>
-                </Grid>
-            </Paper>
 
             {/* Formulario para gestionar inscripciones */}
             <Paper elevation={0} sx={{ p: 2, mb: 3 }}>
@@ -423,6 +384,46 @@ function Inscripciones() {
                     )}
                 </form>
             </Paper>
+            <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>Búsqueda de Inscripciones</Typography>
+
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Curso"
+                            name="curso"
+                            value={search.curso}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Estudiante"
+                            name="estudiante"
+                            value={search.estudiante}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Nota"
+                            name="nota"
+                            value={search.nota}
+                            onChange={handleSearchChange}
+                            fullWidth
+                            type="number"
+                            step="0.01"
+                            inputProps={{
+                                min: 0, // Valor mínimo
+                                max: 10, // Valor máximo
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+            </Paper>
+
             {/* Tabla para mostrar las inscripciones */}
             <TableContainer component={Paper} sx={{ mt: 4 }}>
                 <Table>

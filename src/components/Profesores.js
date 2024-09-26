@@ -289,65 +289,6 @@ function Profesores() {
           {error}
         </Alert>
       )}
-      <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>Búsqueda de Profesores</Typography>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Buscar por DNI"
-              name="dni"
-              value={search.dni}
-              onChange={handleSearchChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Buscar por Nombre"
-              name="nombre"
-              value={search.nombre}
-              onChange={handleSearchChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Buscar por Apellido"
-              name="apellido"
-              value={search.apellido}
-              onChange={handleSearchChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Buscar por Email"
-              name="email"
-              value={search.email}
-              onChange={handleSearchChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Buscar por Profesión"
-              name="profesion"
-              value={search.profesion}
-              onChange={handleSearchChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Buscar por Teléfono"
-              name="telefono"
-              value={search.telefono}
-              onChange={handleSearchChange}
-              fullWidth
-            />
-          </Grid>
-        </Grid>
-      </Paper>
 
       {/* Formulario para agregar o editar un profesor */}
       <Paper elevation={0} sx={{ p: 2, mb: 3 }}>
@@ -452,6 +393,66 @@ function Profesores() {
             </Alert>
           )}
         </form>
+      </Paper>
+
+      <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>Búsqueda de Profesores</Typography>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Buscar por DNI"
+              name="dni"
+              value={search.dni}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Buscar por Nombre"
+              name="nombre"
+              value={search.nombre}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Buscar por Apellido"
+              name="apellido"
+              value={search.apellido}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Buscar por Email"
+              name="email"
+              value={search.email}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Buscar por Profesión"
+              name="profesion"
+              value={search.profesion}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Buscar por Teléfono"
+              name="telefono"
+              value={search.telefono}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+        </Grid>
       </Paper>
 
       {/* Tabla para mostrar la lista de profesores */}
