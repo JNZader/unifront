@@ -30,14 +30,12 @@ Gestión Educativa es una aplicación web diseñada como trabajo final para la m
 1. **Clonar el repositorio**:
 
    ```bash
-   git clone https://github.com/tuusuario/gestion-educativa.git
+   git clone
    ```
 
 2. **Navegar al directorio del proyecto**:
 
-   ```bash
-   cd gestion-educativa
-   ```
+
 
 3. **Instalar las dependencias**:
 
