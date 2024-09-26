@@ -51,7 +51,9 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Button as MuiButton
+    Button as MuiButton,
+    Grid,
+    Typography
 } from '@mui/material';
 import api from '../api/api';
 
@@ -65,10 +67,22 @@ function Cursos() {
         descripcion: '',
         profesorId: ''
     });
+    // Estado para manejar mensajes de error
     const [error, setError] = useState(null);
+    // Estado para controlar la apertura del diálogo de confirmación
     const [open, setOpen] = useState(false);
+    // Estado para almacenar el ID del estudiante a eliminar
     const [idEliminar, setIdEliminar] = useState(null);
+
     const [timeoutId, setTimeoutId] = useState(null);
+
+    const [search, setSearch] = useState({
+        nombre: '',
+        descripcion: '',
+        profesorId: ''
+    });
+
+
 
     /**
      * Carga la lista de cursos y profesores al montar el componente.
@@ -209,66 +223,163 @@ function Cursos() {
      */
     const eliminarCurso = async () => {
         try {
-            await api.delete(`/cursos/${idEliminar}`);
+            await api.delete(`/cursos/${idEliminar}`); // Elimina el curso
             loadCursos(); // Recarga los cursos después de la eliminación.
             setOpen(false); // Cierra el diálogo.
+
+            // Muestra un mensaje de éxito
+            setError('Curso eliminado con éxito'); // Mensaje de éxito
+            clearTimeout(timeoutId); // Limpia el timeout anterior
+            setTimeoutId(setTimeout(() => {
+                setError(''); // Limpia el mensaje de error después de 5 segundos
+            }, 5000));
         } catch (error) {
+            // Manejo de error
             console.error('Error al eliminar curso:', error);
-            setOpen(false);
+            setError('No se pudo eliminar el curso: ' + (error.response?.data || error.message)); // Mensaje de error
+            setOpen(false); // Cierra el diálogo en caso de error
+
+            // Opcional: Resetea el mensaje de error después de 5 segundos
+            clearTimeout(timeoutId);
+            setTimeoutId(setTimeout(() => {
+                setError(''); // Limpia el mensaje de error después de 5 segundos
+            }, 5000));
         }
     };
 
+    const handleSearchChange = (e) => {
+        const { name, value } = e.target;
+        let newValue = value;
+
+        switch (name) {
+            case 'nombre':
+                newValue = value.replace(/[^a-zA-Z\s]/g, ''); // Solo permite letras y espacios.
+                newValue = newValue.substring(0, 50); // Limita la longitud a 50 caracteres.
+                break;
+            case 'descripcion':
+                newValue = value.substring(0, 200); // Limita la longitud a 200 caracteres.
+                break;
+            default:
+                break;
+        }
+
+        setSearch(prev => ({ ...prev, [name]: newValue }));
+    };
+
+
+    const filteredCursos = cursos.filter(curso => {
+        return (
+            curso.nombre.toLowerCase().includes(search.nombre.toLowerCase()) &&
+            curso.descripcion.toLowerCase().includes(search.descripcion.toLowerCase()) &&
+            (search.profesorId === '' || curso.profesor?.id.toString() === search.profesorId)
+        );
+    });
+
+
     return (
         <div>
-            <h2>Gestión de Cursos</h2>
+            <Typography variant="h4" gutterBottom>Gestión de Cursos</Typography>
+            {/* Muestra un mensaje de error si hay algún problema */}
+            {error && (
+                <Alert severity="error" onClose={() => setError(null)}>
+                    {error}
+                </Alert>
+            )}
+
+            {/* Search Section */}
+            <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>Búsqueda de Cursos</Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Nombre"
+                            name="nombre"
+                            value={search.nombre}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Descripción"
+                            name="descripcion"
+                            value={search.descripcion}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            select
+                            label="Buscar por Profesor"
+                            name="profesorId"
+                            value={search.profesorId}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        >
+                            <MenuItem value="">Todos los profesores</MenuItem>
+                            {profesores.map(profesor => (
+                                <MenuItem key={profesor.id} value={profesor.id.toString()}>
+                                    {profesor.nombre} {profesor.apellido}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
+                </Grid>
+            </Paper>
             {/* Formulario para crear/editar cursos */}
-            <form onSubmit={handleSubmit}>
-                {/* Campo de texto para ingresar el nombre del curso */}
-                <TextField
-                    label="Nombre del Curso"
-                    name="nombre"
-                    value={form.nombre}
-                    onChange={handleChange}
-                    required
-                    fullWidth
-                    margin="normal" // Añade espacio alrededor del campo
-                />
+            <Paper elevation={0} sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                    {editing ? 'Editar Curso' : 'Agregar Nuevo Curso'}
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    {/* Campo de texto para ingresar el nombre del curso */}
+                    <TextField
+                        label="Nombre del Curso"
+                        name="nombre"
+                        value={form.nombre}
+                        onChange={handleChange}
+                        required
+                        fullWidth
+                        margin="normal" // Añade espacio alrededor del campo
+                    />
 
-                {/* Campo de texto para ingresar la descripción del curso */}
-                <TextField
-                    label="Descripción"
-                    name="descripcion"
-                    value={form.descripcion}
-                    onChange={handleChange}
-                    required
-                    fullWidth
-                    margin="normal"
-                />
+                    {/* Campo de texto para ingresar la descripción del curso */}
+                    <TextField
+                        label="Descripción"
+                        name="descripcion"
+                        value={form.descripcion}
+                        onChange={handleChange}
+                        required
+                        fullWidth
+                        margin="normal"
+                    />
 
-                {/* Selector desplegable para asignar un profesor al curso */}
-                <TextField
-                    select
-                    label="Profesor"
-                    name="profesorId"
-                    value={form.profesorId}
-                    onChange={handleChange}
-                    required
-                    fullWidth
-                    margin="normal"
-                >
-                    {/* Muestra una lista de profesores como opciones dentro del menú desplegable */}
-                    {profesores.map(profesor => (
-                        <MenuItem key={profesor.id} value={profesor.id}>
-                            {profesor.nombre} {profesor.apellido}
-                        </MenuItem>
-                    ))}
-                </TextField>
+                    {/* Selector desplegable para asignar un profesor al curso */}
+                    <TextField
+                        select
+                        label="Profesor"
+                        name="profesorId"
+                        value={form.profesorId}
+                        onChange={handleChange}
+                        required
+                        fullWidth
+                        margin="normal"
+                    >
+                        {/* Muestra una lista de profesores como opciones dentro del menú desplegable */}
+                        {profesores.map(profesor => (
+                            <MenuItem key={profesor.id} value={profesor.id}>
+                                {profesor.nombre} {profesor.apellido}
+                            </MenuItem>
+                        ))}
+                    </TextField>
 
-                {/* Botón para guardar o actualizar el curso */}
-                <Button variant="contained" color="primary" type="submit">
-                    {editing ? 'Actualizar Curso' : 'Guardar Curso'}
-                </Button>
-            </form>
+                    {/* Botón para guardar o actualizar el curso */}
+                    <Button variant="contained" color="primary" type="submit">
+                        {editing ? 'Actualizar Curso' : 'Guardar Curso'}
+                    </Button>
+                </form>
+            </Paper>
 
             {/* Tabla de cursos */}
             <TableContainer component={Paper} style={{ marginTop: '20px' }}>
@@ -284,7 +395,7 @@ function Cursos() {
                     </TableHead>
                     <TableBody>
                         {/* Itera sobre la lista de cursos y los muestra en la tabla */}
-                        {cursos.map(curso => (
+                        {filteredCursos.map(curso => (
                             <TableRow key={curso.id}>
                                 <TableCell>{curso.nombre}</TableCell>
                                 <TableCell>{curso.descripcion}</TableCell>

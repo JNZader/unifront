@@ -47,7 +47,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button as MuiButton
+  Button as MuiButton,
+  Grid,
+  Typography
 } from '@mui/material';
 import api from '../api/api';
 
@@ -69,6 +71,15 @@ function Estudiantes() {
   const [open, setOpen] = useState(false);
   // Estado para almacenar el ID del estudiante a eliminar
   const [idEliminar, setIdEliminar] = useState(null);
+
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  const [search, setSearch] = useState({
+    dni: '',
+    nombre: '',
+    apellido: '',
+    email: ''
+  });
 
   // Carga la lista de estudiantes al montar el componente
   useEffect(() => {
@@ -188,90 +199,192 @@ function Estudiantes() {
    */
   const eliminarEstudiante = async () => {
     try {
-      await api.delete(`/estudiantes/${idEliminar}`);
-      loadEstudiantes();
-      setOpen(false);
-      setError(null);
+      await api.delete(`/estudiantes/${idEliminar}`); // Elimina el estudiante
+      loadEstudiantes(); // Recarga la lista de estudiantes
+      setOpen(false); // Cierra el diálogo
+
+      // Muestra un mensaje de éxito
+      setError('Estudiante eliminado con éxito'); // Mensaje de éxito
+      clearTimeout(timeoutId); // Limpia el timeout anterior
+      setTimeoutId(setTimeout(() => {
+        setError(''); // Limpia el mensaje de error después de 5 segundos
+      }, 5000));
     } catch (error) {
+      // Manejo de error
       console.error('Error al eliminar estudiante:', error);
-      setError('Error al eliminar estudiante. Verifica que el ID sea correcto.');
-      setTimeout(() => setError(null), 5000); // Borra el error después de 5 segundos
-      setOpen(false);
+      setError('No se pudo eliminar el estudiante: ' + (error.response?.data || error.message)); // Mensaje de error
+      setOpen(false); // Cierra el diálogo en caso de error
+
+      // Opcional: Resetea el mensaje de error después de 5 segundos
+      clearTimeout(timeoutId);
+      setTimeoutId(setTimeout(() => {
+        setError(''); // Limpia el mensaje de error después de 5 segundos
+      }, 5000));
     }
   };
 
+  const handleSearchChange = (e) => {
+    const { name, value } = e.target;
+    let newValue = value;
+
+    switch (name) {
+      case 'dni':
+        newValue = value.replace(/[^0-9]/g, '').substring(0, 8);
+        break;
+      case 'nombre':
+      case 'apellido':
+        newValue = value.replace(/[^a-zA-Z\s]/g, '').substring(0, 50);
+        break;
+      case 'email':
+        // La expresión regular para el correo electrónico debe ser más precisa
+        newValue = value.replace(/[^a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '');
+        newValue = newValue.substring(0, 100);
+        break;
+      default:
+        break;
+    }
+
+    setSearch(prev => ({ ...prev, [name]: newValue }));
+  };
+
+
+  const filteredEstudiantes = estudiantes.filter(estudiante => {
+    return (
+      estudiante.dni.toLowerCase().includes(search.dni.toLowerCase()) &&
+      estudiante.nombre.toLowerCase().includes(search.nombre.toLowerCase()) &&
+      estudiante.apellido.toLowerCase().includes(search.apellido.toLowerCase()) &&
+      estudiante.email.toLowerCase().includes(search.email.toLowerCase())
+    );
+  });
+
   return (
     <div>
-      <h2>Gestión de Estudiantes</h2>
+      <Typography variant="h4" gutterBottom>Gestión de Estudiantes</Typography>
+
+      {/* Muestra un mensaje de error si hay algún problema */}
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+      <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>Búsqueda de Estudiantes</Typography>
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={3}>
+            <TextField
+              label="Buscar por DNI"
+              name="dni"
+              value={search.dni}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <TextField
+              label="Buscar por Nombre"
+              name="nombre"
+              value={search.nombre}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <TextField
+              label="Buscar por Apellido"
+              name="apellido"
+              value={search.apellido}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <TextField
+              label="Buscar por Email"
+              name="email"
+              value={search.email}
+              onChange={handleSearchChange}
+              fullWidth
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
       {/* Formulario para agregar o editar estudiantes */}
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="DNI"
-          name="dni"
-          value={form.dni}
-          onChange={handleChange}
-          required
-          margin="normal"
-          fullWidth
-          inputProps={{
-            maxLength: 8,
-            pattern: "[0-9]*" // Asegura que solo se ingresen números
-          }}
-        />
-        <TextField
-          label="Nombre"
-          name="nombre"
-          value={form.nombre}
-          onChange={handleChange}
-          required
-          margin="normal"
-          fullWidth
-          inputProps={{
-            maxLength: 50 // Limita la longitud del nombre
-          }}
-        />
-        <TextField
-          label="Apellido"
-          name="apellido"
-          value={form.apellido}
-          onChange={handleChange}
-          required
-          margin="normal"
-          fullWidth
-          inputProps={{
-            maxLength: 50 // Limita la longitud del apellido
-          }}
-        />
-        <TextField
-          label="Email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          margin="normal"
-          fullWidth
-          type="email" // Establece el tipo de entrada como email
-          inputProps={{
-            maxLength: 254 // Limita la longitud del email
-          }}
-        />
-        {/* Botón para enviar el formulario */}
-        <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
-          {editing ? 'Actualizar Estudiante' : 'Guardar Estudiante'}
-        </Button>
-        {/* Botón para cancelar la edición */}
-        {editing && (
-          <Button variant="outlined" color="secondary" onClick={() => setEditing(null)} sx={{ mt: 2, ml: 2 }}>
-            Cancelar
+      <Paper elevation={0} sx={{ p: 2, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          {editing ? 'Editar Estudiante' : 'Agregar Nuevo Estudiante'}
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="DNI"
+            name="dni"
+            value={form.dni}
+            onChange={handleChange}
+            required
+            margin="normal"
+            fullWidth
+            inputProps={{
+              maxLength: 8,
+              pattern: "[0-9]*" // Asegura que solo se ingresen números
+            }}
+          />
+          <TextField
+            label="Nombre"
+            name="nombre"
+            value={form.nombre}
+            onChange={handleChange}
+            required
+            margin="normal"
+            fullWidth
+            inputProps={{
+              maxLength: 50 // Limita la longitud del nombre
+            }}
+          />
+          <TextField
+            label="Apellido"
+            name="apellido"
+            value={form.apellido}
+            onChange={handleChange}
+            required
+            margin="normal"
+            fullWidth
+            inputProps={{
+              maxLength: 50 // Limita la longitud del apellido
+            }}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            margin="normal"
+            fullWidth
+            type="email" // Establece el tipo de entrada como email
+            inputProps={{
+              maxLength: 254 // Limita la longitud del email
+            }}
+          />
+          {/* Botón para enviar el formulario */}
+          <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
+            {editing ? 'Actualizar Estudiante' : 'Guardar Estudiante'}
           </Button>
-        )}
-        {/* Mensaje de error si ocurre algún problema */}
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
-      </form>
+          {/* Botón para cancelar la edición */}
+          {editing && (
+            <Button variant="outlined" color="secondary" onClick={() => setEditing(null)} sx={{ mt: 2, ml: 2 }}>
+              Cancelar
+            </Button>
+          )}
+          {/* Mensaje de error si ocurre algún problema */}
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
+        </form>
+      </Paper>
+
       {/* Tabla para mostrar la lista de estudiantes */}
       <TableContainer component={Paper} sx={{ mt: 4 }}>
         <Table>
@@ -285,7 +398,7 @@ function Estudiantes() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {estudiantes.map(estudiante => (
+            {filteredEstudiantes.map(estudiante => (
               <TableRow key={estudiante.id}>
                 <TableCell>{estudiante.dni}</TableCell>
                 <TableCell>{estudiante.nombre}</TableCell>

@@ -52,7 +52,26 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button as MuiButton, Alert } from '@mui/material';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Button,
+    TextField,
+    MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button as MuiButton,
+    Alert,
+    Grid,
+    Typography
+} from '@mui/material';
 import api from '../api/api';
 
 function Inscripciones() {
@@ -67,6 +86,13 @@ function Inscripciones() {
         nota: '',         // Nota de la inscripción
         fecha: ''        // Fecha de la inscripción
     }); // Datos del formulario
+
+    const [search, setSearch] = useState({
+        curso: '',
+        estudiante: '',
+        nota: ''
+    });
+
     const [open, setOpen] = useState(false); // Estado para el diálogo de eliminación
     const [idEliminar, setIdEliminar] = useState(null); // ID de inscripción a eliminar
     const [error, setError] = useState(''); // Estado para manejar el error
@@ -189,115 +215,214 @@ function Inscripciones() {
             await api.delete(`/cursos-estudiantes/${idEliminar}`); // Elimina la inscripción
             loadInscripciones(); // Recarga las inscripciones
             setOpen(false); // Cierra el diálogo
-            setError(''); // Limpia el error en caso de éxito
+
+            // Muestra un mensaje de éxito
+            setError('Inscripción eliminada con éxito'); // Mensaje de éxito
             clearTimeout(timeoutId); // Limpia el timeout anterior
             setTimeoutId(setTimeout(() => {
                 setError(''); // Limpia el mensaje de error después de 3 segundos
             }, 3000));
         } catch (error) {
-            setError('Error al eliminar inscripción: ' + error.message); // Manejo de error
+            // Manejo de error
+            setError('No se pudo eliminar la inscripción: ' + (error.response?.data || error.message));
             console.error('Error al eliminar inscripción:', error);
             setOpen(false); // Cierra el diálogo en caso de error
+
+            // Opcional: Resetea el mensaje de error después de 3 segundos
+            clearTimeout(timeoutId);
+            setTimeoutId(setTimeout(() => {
+                setError(''); // Limpia el mensaje de error después de 3 segundos
+            }, 3000));
         }
     };
 
+    // Handle search input changes
+    const handleSearchChange = (e) => {
+        const { name, value } = e.target;
+        let newValue = value;
+
+        // Filtrado de entradas según el campo
+        switch (name) {
+            case 'nota':
+                // Eliminar caracteres no numéricos
+                newValue = value.replace(/[^0-9]/g, '');
+                // Limitar el valor a un rango del 0 al 10
+                newValue = Math.max(0, Math.min(10, parseInt(newValue))) || ''; // Si newValue es NaN, se asigna una cadena vacía
+                break;
+            case 'curso':
+            case 'estudiante':
+                // Validación para nombre de curso y estudiante
+                // Limitar a 50 caracteres
+                newValue = value.replace(/[^a-zA-Z\s]/g, '').substring(0, 50);
+                break;
+            default:
+                break;
+        }
+
+        // Actualizar el estado de la búsqueda
+        setSearch(prev => ({
+            ...prev,
+            [name]: newValue
+        }));
+    };
+
+    // Filter inscripciones based on search criteria
+    const filteredInscripciones = inscripciones.filter(inscripcion => {
+        return (
+            (search.curso === '' || inscripcion.curso.nombre.toLowerCase().includes(search.curso.toLowerCase())) &&
+            (search.estudiante === '' ||
+                `${inscripcion.estudiante.nombre} ${inscripcion.estudiante.apellido}`
+                    .toLowerCase()
+                    .includes(search.estudiante.toLowerCase())) &&
+            (search.nota === '' || inscripcion.nota.toString().includes(search.nota))
+        );
+    });
+
+
     return (
         <div>
-            <h2>Gestión de Inscripciones</h2>
-
+            <Typography variant="h4" gutterBottom>Gestión de Inscripciones</Typography>
             {/* Muestra un mensaje de error si hay algún problema */}
-            {error && <Alert severity="error">{error}</Alert>}
+            {error && (
+                <Alert severity="error" onClose={() => setError(null)}>
+                    {error}
+                </Alert>
+            )}
+            {/* campos de busqueda */}
+            <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>Búsqueda de Inscripciones</Typography>
+
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Curso"
+                            name="curso"
+                            value={search.curso}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Estudiante"
+                            name="estudiante"
+                            value={search.estudiante}
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <TextField
+                            label="Buscar por Nota"
+                            name="nota"
+                            value={search.nota}
+                            onChange={handleSearchChange}
+                            fullWidth
+                            type="number"
+                            step="0.01"
+                            inputProps={{
+                                min: 0, // Valor mínimo
+                                max: 10, // Valor máximo
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+            </Paper>
 
             {/* Formulario para gestionar inscripciones */}
-            <form onSubmit={handleSubmit}>
-                {/* Selección de curso */}
-                <TextField
-                    select
-                    label="Curso"
-                    name="cursoId"
-                    value={form.cursoId}
-                    onChange={handleChange}
-                    required
-                    margin="normal"
-                    fullWidth
-                >
-                    {/* Mapea y muestra los cursos disponibles */}
-                    {cursos.map((curso) => (
-                        <MenuItem key={curso.id} value={curso.id}>
-                            {curso.nombre}
-                        </MenuItem>
-                    ))}
-                </TextField>
+            <Paper elevation={0} sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                    {editing ? 'Editar Inscripcion' : 'Agregar Nueva Inscripcion'}
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    {/* Selección de curso */}
+                    <TextField
+                        select
+                        label="Curso"
+                        name="cursoId"
+                        value={form.cursoId}
+                        onChange={handleChange}
+                        required
+                        margin="normal"
+                        fullWidth
+                    >
+                        {/* Mapea y muestra los cursos disponibles */}
+                        {cursos.map((curso) => (
+                            <MenuItem key={curso.id} value={curso.id}>
+                                {curso.nombre}
+                            </MenuItem>
+                        ))}
+                    </TextField>
 
-                {/* Selección de estudiante */}
-                <TextField
-                    select
-                    label="Estudiante"
-                    name="estudianteId"
-                    value={form.estudianteId}
-                    onChange={handleChange}
-                    required
-                    margin="normal"
-                    fullWidth
-                >
-                    {/* Mapea y muestra los estudiantes disponibles */}
-                    {estudiantes.map((estudiante) => (
-                        <MenuItem key={estudiante.id} value={estudiante.id}>
-                            {estudiante.nombre} {estudiante.apellido}
-                        </MenuItem>
-                    ))}
-                </TextField>
+                    {/* Selección de estudiante */}
+                    <TextField
+                        select
+                        label="Estudiante"
+                        name="estudianteId"
+                        value={form.estudianteId}
+                        onChange={handleChange}
+                        required
+                        margin="normal"
+                        fullWidth
+                    >
+                        {/* Mapea y muestra los estudiantes disponibles */}
+                        {estudiantes.map((estudiante) => (
+                            <MenuItem key={estudiante.id} value={estudiante.id}>
+                                {estudiante.nombre} {estudiante.apellido}
+                            </MenuItem>
+                        ))}
+                    </TextField>
 
-                {/* Campo para ingresar la nota */}
-                <TextField
-                    label="Nota"
-                    name="nota"
-                    value={form.nota}
-                    onChange={handleChange}
-                    required
-                    margin="normal"
-                    type="number"
-                    step="0.01"
-                    fullWidth
-                    inputProps={{
-                        min: 0, // Valor mínimo
-                        max: 10, // Valor máximo
-                    }}
-                />
+                    {/* Campo para ingresar la nota */}
+                    <TextField
+                        label="Nota"
+                        name="nota"
+                        value={form.nota}
+                        onChange={handleChange}
+                        required
+                        margin="normal"
+                        type="number"
+                        step="0.01"
+                        fullWidth
+                        inputProps={{
+                            min: 0, // Valor mínimo
+                            max: 10, // Valor máximo
+                        }}
+                    />
 
-                {/* Campo para seleccionar la fecha */}
-                <TextField
-                    label="Fecha"
-                    name="fecha"
-                    value={form.fecha}
-                    onChange={handleChange}
-                    required
-                    margin="normal"
-                    type="date"
-                    fullWidth
-                    InputLabelProps={{
-                        shrink: true, // Mantiene la etiqueta arriba del campo
-                    }}
-                    inputProps={{
-                        min: '2012-01-01', // Fecha mínima
-                        max: '2032-12-31', // Fecha máxima
-                        style: { padding: '10px' }, // Estilo del campo
-                    }}
-                />
+                    {/* Campo para seleccionar la fecha */}
+                    <TextField
+                        label="Fecha"
+                        name="fecha"
+                        value={form.fecha}
+                        onChange={handleChange}
+                        required
+                        margin="normal"
+                        type="date"
+                        fullWidth
+                        InputLabelProps={{
+                            shrink: true, // Mantiene la etiqueta arriba del campo
+                        }}
+                        inputProps={{
+                            min: '2012-01-01', // Fecha mínima
+                            max: '2032-12-31', // Fecha máxima
+                            style: { padding: '10px' }, // Estilo del campo
+                        }}
+                    />
 
-                {/* Botón para guardar o actualizar la inscripción */}
-                <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
-                    {editing ? 'Actualizar Inscripción' : 'Guardar Inscripción'}
-                </Button>
-
-                {/* Botón para cancelar la edición si está en modo edición */}
-                {editing && (
-                    <Button variant="outlined" color="secondary" onClick={() => setEditing(null)} sx={{ mt: 2, ml: 2 }}>
-                        Cancelar
+                    {/* Botón para guardar o actualizar la inscripción */}
+                    <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
+                        {editing ? 'Actualizar Inscripción' : 'Guardar Inscripción'}
                     </Button>
-                )}
-            </form>
 
+                    {/* Botón para cancelar la edición si está en modo edición */}
+                    {editing && (
+                        <Button variant="outlined" color="secondary" onClick={() => setEditing(null)} sx={{ mt: 2, ml: 2 }}>
+                            Cancelar
+                        </Button>
+                    )}
+                </form>
+            </Paper>
             {/* Tabla para mostrar las inscripciones */}
             <TableContainer component={Paper} sx={{ mt: 4 }}>
                 <Table>
@@ -312,7 +437,7 @@ function Inscripciones() {
                     </TableHead>
                     <TableBody>
                         {/* Mapea y muestra las inscripciones existentes */}
-                        {inscripciones.map(inscripcion => (
+                        {filteredInscripciones.map(inscripcion => (
                             <TableRow key={inscripcion.id}>
                                 <TableCell>{inscripcion.curso.nombre}</TableCell>
                                 <TableCell>{inscripcion.estudiante.nombre} {inscripcion.estudiante.apellido}</TableCell>
